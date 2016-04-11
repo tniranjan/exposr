@@ -1,0 +1,21 @@
+<html>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+  <head>
+    <title>Exposr</title>
+  </head>
+<body>
+<div>
+  <h1> Exposr</h1>
+
+  <form action="upload" method="post" enctype="multipart/form-data">
+    <input type="file"  name="file">  <input type="submit" class="button" value="Upload">
+  </form>
+  <video width="320" height="240" >
+
+  <source src="/static/uploads/zoom.mp4" type="video/mp4">
+  </video>
+
+</div>
+</body>
+</html>

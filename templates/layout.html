@@ -1,0 +1,13 @@
+<!doctype html>
+<title>Exposr</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/favicon.png">
+<link rel="shortcut icon" href="/static/favicon.ico">
+<div class=container>
+  <h1>Exposr</h1>
+A web app for creating long exposure photographs from hand held videos.
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

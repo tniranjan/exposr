@@ -1,0 +1,5 @@
+{% extends "layout.html" %}
+{% block body %}
+<img src="{{ url_for('viewr',filename=filename) }}">
+    <div class="centeredelements"><a class="button" href={{url_for('viewerv',filename=filename)}}>View Original</a>&nbsp;<a class="button" href={{ url_for('viewerp',filename=filename)}}>Exposr</a>&nbsp;<a class="button" href="{{url_for('show_entries')}}">Back to Main Page</a></div>
+{% endblock %}
