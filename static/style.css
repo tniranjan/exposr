@@ -82,6 +82,9 @@ th {
     border-radius: 4px;
     cursor: pointer;
 }
+.redbutton {
+  background-color: #ff3333;
+}
 .centeredelements{
   text-align: center;
 }

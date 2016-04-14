@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
+
+A web app for creating long exposure photographs from hand held videos.
   <ul class=entries>
   {% for entry in entries %}
     <h2>{{ entry.description }}</h2>
     <video width="100%" >
       <source src={{"/static/uploads/" ~ entry.filename}} type="video/mp4">
     </video><br>
-<a class="button" href="{{ url_for('viewerv', filename=entry.filename) }}">Open</a>
-
+    <a class="button" href="{{ url_for('viewer', filename=entry.filename) }}">Open</a>
+    {% if session.logged_in %}
+    <a class="button redbutton" href="{{ url_for('rementry', id=entry.id) }}">Remove</a>
+    {% endif %}
   {% else %}
     <em>Unbelievable.  No entries here so far</em>
   {% endfor %}
@@ -15,7 +19,7 @@
   Alternatively, you can upload your own video below.
   <div class="centeredelements">
   <form action="upload" method="post" enctype="multipart/form-data">
-    <input type="file"  name="file"><input type=text size=30 name=description value="Title">
+     <input type="file"  name="file"><input type=text size=30 name=description value="Title">
      <input type="submit" class="button" value="Upload">
   </form>
   </div>

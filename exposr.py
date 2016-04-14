@@ -6,17 +6,12 @@ from contextlib import closing
 from processr import Processr
 from viewr import Viewr
 from werkzeug import secure_filename
+from flask_jsglue import JSGlue
 
-# configuration
-DATABASE = '/tmp/exposr.db'
-DEBUG = True
-SECRET_KEY = 'development key'
-USERNAME = 'oculonterrin'
-PASSWORD = 'sleeponthefloor'
-UPLOAD_FOLDER = 'static/uploads/'
 # create our little application :)
 app = Flask(__name__)
-app.config.from_object(__name__)
+app.config.from_object('config')
+jsglue = JSGlue(app)
 
 app.config['ALLOWED_EXTENSIONS'] = set(['mp4'])
 def allowed_file(filename):
@@ -44,8 +39,8 @@ def teardown_request(exception):
 
 @app.route('/')
 def show_entries():
-    cur = g.db.execute('select filename, description from entries order by id desc')
-    entries = [dict(filename=row[0], description=row[1]) for row in cur.fetchall()]
+    cur = g.db.execute('select id, filename, description from entries order by id desc')
+    entries = [dict(id=row[0], filename=row[1], description=row[2]) for row in cur.fetchall()]
     return render_template('show_entries.html', entries=entries)
 
 
@@ -61,27 +56,54 @@ def upload():
         flash('New entry was successfully posted')
         return redirect(url_for('show_entries'))
 
-@app.route('/process/<filename>')
-def processr(filename):
-    return Response(gen(Processr(app.config['UPLOAD_FOLDER']+filename)),
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME']:
+            error = 'Invalid username'
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Invalid password'
+        else:
+            session['logged_in'] = True
+            flash('You were logged in')
+            return redirect(url_for('show_entries'))
+    return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('You were logged out')
+    return redirect(url_for('show_entries'))
+
+@app.route('/remove/<id>')
+def rementry(id):
+    g.db.execute('delete from entries where id=' + id)
+    g.db.commit()
+    flash('Entry was successfully removed')
+    return redirect(url_for('show_entries'))
+
+@app.route('/process/<filename>/<runningFlag>')
+def processr(filename,runningFlag):
+    return Response(gen(Processr(app.config['UPLOAD_FOLDER']+filename),runningFlag),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/view/<filename>')
-def viewr(filename):
-    return Response(gen(Viewr(app.config['UPLOAD_FOLDER']+filename)),
+@app.route('/view/<filename>/<runningFlag>')
+def viewr(filename,runningFlag):
+    return Response(gen(Viewr(app.config['UPLOAD_FOLDER']+filename),runningFlag),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-@app.route('/viewerv/<filename>')
-def viewerv(filename):
-    return render_template('viewerv.html',filename=filename)
-@app.route('/viewerp/<filename>')
-def viewerp(filename):
-    return render_template('viewerp.html',filename=filename)
 
-def gen(video):
+@app.route('/viewer/<filename>')
+def viewer(filename):
+    return render_template('viewer.html',filename=filename)
+
+def gen(video,runningFlag):
     while True:
-        frame = video.get_frame()
+        frame, isImage = video.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        if runningFlag=='1':
+            break
 
 
 if __name__ == '__main__':

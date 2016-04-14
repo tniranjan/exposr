@@ -14,7 +14,7 @@ class Processr(object):
         self.sum_im=np.asarray( ref_cframe[:,:,:])
         [H,W,C]=self.sum_im.shape
         self.pixnum=np.ones((H,W,C))
-
+        self.isImage=0
     def __del__(self):
         self.video.release()
 
@@ -41,5 +41,8 @@ class Processr(object):
             srcerr=np.array([srcerr])
             dstrr=cv2.perspectiveTransform(srcerr,M)
             avg8=cv2.convertScaleAbs(avg)
-            ret, jpeg = cv2.imencode('.jpg', avg8)
-        return jpeg.tobytes()
+            ret, self.jpeg = cv2.imencode('.jpg', avg8)
+            self.isImage=1
+        else:
+            self.isImage=0
+        return (self.jpeg.tobytes(),self.isImage)

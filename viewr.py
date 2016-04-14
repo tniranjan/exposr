@@ -7,11 +7,16 @@ class Viewr(object):
         ret, ref_cframe = self.video.read()
         while not(ret):
             ret, ref_cframe = cap.read()
+        self.isImage=0
 
     def __del__(self):
         self.video.release()
 
     def get_frame(self):
         ret, cframe = self.video.read()
-        ret, jpeg = cv2.imencode('.jpg', cframe)
-        return jpeg.tobytes()
+        if ret:
+            ret, self.jpeg = cv2.imencode('.jpg', cframe)
+            self.isImage=1
+        else:
+            self.isImage=0
+        return (self.jpeg.tobytes(),self.isImage)
