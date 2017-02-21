@@ -1,6 +1,6 @@
 # configuration
 DATABASE = '/tmp/exposr.db'
-DEBUG = True
+DEBUG = False
 SECRET_KEY = 'development key'
 USERNAME = 'oculonterrin'
 PASSWORD = 'sleeponthefloor'
