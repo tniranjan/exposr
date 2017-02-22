@@ -1,0 +1,63 @@
+<!doctype html>
+<title>Exposr</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/favicon.png">
+<link rel="shortcut icon" href="/static/favicon.ico">
+{{ JSGlue.include() }}
+{% block javascript %}
+<script type="text/javascript">
+var runningFlag=1;
+window.onload = function() {
+  if (document.getElementById('myviewer')){
+    mybtnv();
+  }
+};
+function mybtnv() {
+  runningFlag=runningFlag?0:1;
+  document.getElementById("myviewer").src = Flask.url_for("viewr", {"filename":("{{filename}}"), "runningFlag": runningFlag})
+  var vmbv=document.getElementById("mbv");
+  var vmbp=document.getElementById("mbp");
+  if(!runningFlag){
+    vmbv.style.backgroundColor="#ff3333";
+    vmbv.textContent="Viewing Original";
+    vmbp.style.backgroundColor="#cccccc";
+  }
+  else {
+    vmbv.style.backgroundColor="#268bd2";
+    vmbv.textContent="View Original";
+    vmbp.style.backgroundColor="#268bd2";
+  }
+}
+function mybtnp() {
+  runningFlag=runningFlag?0:1;
+  document.getElementById("myviewer").src = Flask.url_for("processr", {"filename":("{{filename}}"), "runningFlag": runningFlag})
+  var vmbv=document.getElementById("mbv");
+  var vmbp=document.getElementById("mbp");
+  if(!runningFlag){
+    vmbp.style.backgroundColor="#ff3333";
+    vmbp.textContent="Exposing";
+    vmbv.style.backgroundColor="#cccccc";
+  }
+  else {
+    vmbp.style.backgroundColor="#268bd2";
+    vmbp.textContent="Exposr";
+    vmbv.style.backgroundColor="#268bd2";
+  }
+}
+</script>
+
+{% endblock %}
+
+<div class=container>
+  <h1>Exposr</h1>
+  {% for message in get_flashed_messages() %}
+  <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+  {% if not session.logged_in %}
+  <a href="{{ url_for('login') }}">log in</a>
+  {% else %}
+  <a href="{{ url_for('logout') }}">log out</a>
+  {% endif %}
+</div>
+</div>
